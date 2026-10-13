@@ -1,4 +1,4 @@
-# Warehouse Order Fulfillment System
+# Project 13: Warehouse Order Fulfillment System
 
 Capstone project for CS410 Introduction to Software Engineering.
 
