@@ -9,13 +9,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Configure
-        run: cmake -S . -B build
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 
       - name: Build
         run: cmake --build build
 
       - name: Test
-        run: ctest --test-dir build 
+        run: ctest --test-dir build --output-on-failure --no-tests=error
