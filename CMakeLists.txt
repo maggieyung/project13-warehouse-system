@@ -13,6 +13,7 @@ add_library(warehouse_core
     src/Order.cpp
     src/OrderBook.cpp
     src/OrderCommand.cpp
+    src/inventory.cpp
 )
 target_include_directories(warehouse_core PUBLIC include)
 
@@ -37,6 +38,7 @@ include(GoogleTest)
 add_executable(warehouse_tests
     test/order_book_test.cpp
     test/order_command_test.cpp
+    test/inventory_test.cpp
 )
 target_link_libraries(warehouse_tests PRIVATE warehouse_core GTest::gtest_main)
 gtest_discover_tests(warehouse_tests)
