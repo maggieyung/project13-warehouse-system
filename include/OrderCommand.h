@@ -15,7 +15,7 @@ struct ParsedOrder {
 bool parseOrderCommand(const std::string& input, ParsedOrder& out, std::string& error);
 
 // Parses one console line, runs it against the book and stock, and returns the message to show.
-// Handles "order ..." lines. Any other input returns an "unknown command" message.
+// Handles "order ..." and "fulfill <orderId>" lines.
 std::string runOrderCommand(OrderBook& book, OrderBook::StockMap& stock, const std::string& input);
 
 #endif
