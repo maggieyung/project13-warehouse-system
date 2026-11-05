@@ -11,7 +11,8 @@ int main()
 
     std::cout << "Warehouse Order Fulfillment\n"
               << "Sample stock: SKU-100 x10, SKU-200 x5\n"
-              << "Commands: order <customerId> <SKU>:<qty> [<SKU>:<qty> ...] | quit\n";
+              << "Commands: order <customerId> <SKU>:<qty> [<SKU>:<qty> ...] | "
+              << "fulfill <orderId> | quit\n";
 
     std::string line;
     while (std::cout << "> " && std::getline(std::cin, line)) {

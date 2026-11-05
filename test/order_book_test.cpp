@@ -137,6 +137,38 @@ TEST(OrderBookTest, FindShortagesListsOnlyShortSkus)
     EXPECT_EQ(shortages, std::vector<std::string>({"SKU-200"}));
 }
 
+TEST(OrderBookTest, PendingOrderCanBeFulfilledOnce)
+{
+    OrderBook book;
+    OrderBook::StockMap stock = sampleStock();
+    int newId = 0;
+
+    ASSERT_EQ(book.createOrder("C1", {{"SKU-100", 2}}, stock, newId), OrderResult::Ok);
+    const Order* order = book.findOrder(newId);
+    ASSERT_NE(order, nullptr);
+    EXPECT_EQ(order->status(), OrderStatus::Pending);
+
+    EXPECT_EQ(book.fulfillOrder(newId), FulfillmentResult::Fulfilled);
+    EXPECT_EQ(order->status(), OrderStatus::Fulfilled);
+}
+
+TEST(OrderBookTest, FulfilledOrderCannotBeFulfilledTwice)
+{
+    OrderBook book;
+    OrderBook::StockMap stock = sampleStock();
+    int newId = 0;
+
+    ASSERT_EQ(book.createOrder("C1", {{"SKU-100", 2}}, stock, newId), OrderResult::Ok);
+    EXPECT_EQ(book.fulfillOrder(newId), FulfillmentResult::Fulfilled);
+    EXPECT_EQ(book.fulfillOrder(newId), FulfillmentResult::AlreadyFulfilled);
+}
+
+TEST(OrderBookTest, UnknownOrderCannotBeFulfilled)
+{
+    OrderBook book;
+    EXPECT_EQ(book.fulfillOrder(99), FulfillmentResult::OrderNotFound);
+}
+
 TEST(OrderTest, MergeDuplicateLinesKeepsFirstSeenOrder)
 {
     std::vector<OrderLine> merged =

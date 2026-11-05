@@ -1,11 +1,12 @@
 #include "OrderCommand.h"
 
 #include <cctype>
+#include <exception>
 #include <sstream>
 
 namespace {
 
-const char* const kUsage = "order <customerId> <SKU>:<qty> [<SKU>:<qty> ...]";
+const char* const kUsage = "order <customerId> <SKU>:<qty> [<SKU>:<qty> ...] | fulfill <orderId>";
 
 std::vector<std::string> splitWhitespace(const std::string& input)
 {
@@ -92,7 +93,36 @@ bool parseOrderCommand(const std::string& input, ParsedOrder& out, std::string& 
 std::string runOrderCommand(OrderBook& book, OrderBook::StockMap& stock, const std::string& input)
 {
     std::vector<std::string> tokens = splitWhitespace(input);
-    if (tokens.empty() || tokens[0] != "order") {
+    if (tokens.empty()) {
+        return std::string("Unknown command. Use: ") + kUsage;
+    }
+
+    if (tokens[0] == "fulfill") {
+        if (tokens.size() != 2) {
+            return "Error: use fulfill <orderId>";
+        }
+
+        try {
+            std::size_t parsedLength = 0;
+            const int orderId = std::stoi(tokens[1], &parsedLength);
+            if (parsedLength != tokens[1].size() || orderId <= 0) {
+                return "Error: order id must be a positive integer";
+            }
+
+            switch (book.fulfillOrder(orderId)) {
+            case FulfillmentResult::Fulfilled:
+                return "Order " + std::to_string(orderId) + " marked fulfilled.";
+            case FulfillmentResult::AlreadyFulfilled:
+                return "Order " + std::to_string(orderId) + " is already fulfilled.";
+            case FulfillmentResult::OrderNotFound:
+                return "Order " + std::to_string(orderId) + " was not found.";
+            }
+        } catch (const std::exception&) {
+            return "Error: order id must be a positive integer";
+        }
+    }
+
+    if (tokens[0] != "order") {
         return std::string("Unknown command. Use: ") + kUsage;
     }
 

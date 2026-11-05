@@ -2,6 +2,7 @@
 #define ORDERBOOK_H
 
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -14,6 +15,12 @@ enum class OrderResult {
     InvalidQuantity,
     UnknownSku,
     InsufficientStock
+};
+
+enum class FulfillmentResult {
+    Fulfilled,
+    OrderNotFound,
+    AlreadyFulfilled
 };
 
 std::string toString(OrderResult result);
@@ -37,10 +44,11 @@ public:
                                              const StockMap& stock) const;
 
     const Order* findOrder(int id) const;
+    FulfillmentResult fulfillOrder(int id);
     std::size_t size() const;
 
 private:
-    std::vector<Order> orders_;
+    std::vector<std::unique_ptr<Order>> orders_;
     int nextId_ = 1;
 };
 

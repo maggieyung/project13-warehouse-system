@@ -109,3 +109,23 @@ TEST(OrderCommandTest, OtherInputIsUnknownCommand)
     EXPECT_TRUE(contains(runOrderCommand(book, stock, "ship 1"), "Unknown command"));
     EXPECT_TRUE(contains(runOrderCommand(book, stock, ""), "Unknown command"));
 }
+
+TEST(OrderCommandTest, FulfillCommandMarksOrderFulfilled)
+{
+    OrderBook book;
+    OrderBook::StockMap stock = sampleStock();
+
+    ASSERT_TRUE(contains(runOrderCommand(book, stock, "order C1 SKU-100:3"),
+                         "Order 1 created"));
+    EXPECT_EQ(runOrderCommand(book, stock, "fulfill 1"), "Order 1 marked fulfilled.");
+    ASSERT_NE(book.findOrder(1), nullptr);
+    EXPECT_EQ(book.findOrder(1)->status(), OrderStatus::Fulfilled);
+}
+
+TEST(OrderCommandTest, FulfillCommandReportsUnknownOrder)
+{
+    OrderBook book;
+    OrderBook::StockMap stock = sampleStock();
+
+    EXPECT_EQ(runOrderCommand(book, stock, "fulfill 99"), "Order 99 was not found.");
+}

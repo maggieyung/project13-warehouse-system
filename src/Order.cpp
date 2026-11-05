@@ -22,6 +22,21 @@ const std::vector<OrderLine>& Order::lines() const
     return lines_;
 }
 
+OrderStatus Order::status() const
+{
+    return status_;
+}
+
+bool Order::markFulfilled()
+{
+    if (status_ == OrderStatus::Fulfilled) {
+        return false;
+    }
+
+    status_ = OrderStatus::Fulfilled;
+    return true;
+}
+
 std::vector<OrderLine> mergeDuplicateLines(const std::vector<OrderLine>& lines)
 {
     std::vector<OrderLine> merged;

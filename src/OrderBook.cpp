@@ -48,7 +48,7 @@ OrderResult OrderBook::createOrder(const std::string& customerId,
         stock[line.sku] -= line.quantity;
     }
     newId = nextId_++;
-    orders_.emplace_back(newId, customerId, merged);
+    orders_.push_back(std::make_unique<Order>(newId, customerId, merged));
     return OrderResult::Ok;
 }
 
@@ -80,12 +80,24 @@ std::vector<std::string> OrderBook::findUnknownSkus(const std::vector<OrderLine>
 
 const Order* OrderBook::findOrder(int id) const
 {
-    for (const Order& order : orders_) {
-        if (order.id() == id) {
-            return &order;
+    for (const std::unique_ptr<Order>& order : orders_) {
+        if (order->id() == id) {
+            return order.get();
         }
     }
     return nullptr;
+}
+
+FulfillmentResult OrderBook::fulfillOrder(int id)
+{
+    for (const std::unique_ptr<Order>& order : orders_) {
+        if (order->id() == id) {
+            return order->markFulfilled() ? FulfillmentResult::Fulfilled
+                                          : FulfillmentResult::AlreadyFulfilled;
+        }
+    }
+
+    return FulfillmentResult::OrderNotFound;
 }
 
 std::size_t OrderBook::size() const
