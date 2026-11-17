@@ -6,8 +6,9 @@
 int main()
 {
     OrderBook book;
-    // Sample stock until the Inventory class is wired in.
-    OrderBook::StockMap stock = {{"SKU-100", 10}, {"SKU-200", 5}};
+    OrderBook::StockMap stock;
+    stock.addStock("SKU-100", 10);
+    stock.addStock("SKU-200", 5);
 
     std::cout << "Warehouse Order Fulfillment\n"
               << "Sample stock: SKU-100 x10, SKU-200 x5\n"
