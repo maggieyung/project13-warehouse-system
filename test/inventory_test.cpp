@@ -44,6 +44,24 @@ TEST(InventoryTest, RejectsNegativeStock)
     EXPECT_EQ(inventory.quantity("KEYBOARD001"), 10);
 }
 
+TEST(InventoryTest, RejectsReservationWhenStockIsInsufficient)
+{
+    Inventory inventory;
+    inventory.addStock("KEYBOARD001", 10);
+
+    EXPECT_FALSE(inventory.reserveStock("KEYBOARD001", 11));
+    EXPECT_EQ(inventory.quantity("KEYBOARD001"), 10);
+}
+
+TEST(InventoryTest, ReservesAvailableStock)
+{
+    Inventory inventory;
+    inventory.addStock("KEYBOARD001", 10);
+
+    EXPECT_TRUE(inventory.reserveStock("KEYBOARD001", 4));
+    EXPECT_EQ(inventory.quantity("KEYBOARD001"), 6);
+}
+
 // Test 5: Unknown product
 TEST(InventoryTest, UnknownProductHasZeroStock)
 {

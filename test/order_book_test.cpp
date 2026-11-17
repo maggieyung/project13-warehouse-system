@@ -8,7 +8,10 @@ namespace {
 
 OrderBook::StockMap sampleStock()
 {
-    return {{"SKU-100", 10}, {"SKU-200", 5}};
+    OrderBook::StockMap stock;
+    stock.addStock("SKU-100", 10);
+    stock.addStock("SKU-200", 5);
+    return stock;
 }
 
 } // namespace
@@ -23,8 +26,8 @@ TEST(OrderBookTest, ValidOrderIsStoredAndReservesStock)
 
     EXPECT_EQ(result, OrderResult::Ok);
     EXPECT_EQ(newId, 1);
-    EXPECT_EQ(stock["SKU-100"], 7);
-    EXPECT_EQ(stock["SKU-200"], 3);
+    EXPECT_EQ(stock.quantity("SKU-100"), 7);
+    EXPECT_EQ(stock.quantity("SKU-200"), 3);
     ASSERT_EQ(book.size(), 1u);
     const Order* order = book.findOrder(newId);
     ASSERT_NE(order, nullptr);
@@ -53,7 +56,7 @@ TEST(OrderBookTest, OrderingExactlyAvailableStockSucceeds)
     int newId = 0;
 
     EXPECT_EQ(book.createOrder("C1", {{"SKU-200", 5}}, stock, newId), OrderResult::Ok);
-    EXPECT_EQ(stock["SKU-200"], 0);
+    EXPECT_EQ(stock.quantity("SKU-200"), 0);
 }
 
 TEST(OrderBookTest, OneShortLineRejectsWholeOrderAndKeepsStock)
@@ -65,7 +68,8 @@ TEST(OrderBookTest, OneShortLineRejectsWholeOrderAndKeepsStock)
     OrderResult result = book.createOrder("C1", {{"SKU-100", 3}, {"SKU-200", 6}}, stock, newId);
 
     EXPECT_EQ(result, OrderResult::InsufficientStock);
-    EXPECT_EQ(stock, sampleStock());
+    EXPECT_EQ(stock.quantity("SKU-100"), 10);
+    EXPECT_EQ(stock.quantity("SKU-200"), 5);
     EXPECT_EQ(book.size(), 0u);
 }
 
@@ -88,7 +92,8 @@ TEST(OrderBookTest, UnknownSkuIsRejected)
     int newId = 0;
 
     EXPECT_EQ(book.createOrder("C1", {{"SKU-999", 1}}, stock, newId), OrderResult::UnknownSku);
-    EXPECT_EQ(stock, sampleStock());
+    EXPECT_EQ(stock.quantity("SKU-100"), 10);
+    EXPECT_EQ(stock.quantity("SKU-200"), 5);
     EXPECT_EQ(book.size(), 0u);
 }
 
@@ -102,7 +107,8 @@ TEST(OrderBookTest, InvalidInputIsRejected)
     EXPECT_EQ(book.createOrder("C1", {}, stock, newId), OrderResult::EmptyOrder);
     EXPECT_EQ(book.createOrder("C1", {{"SKU-100", 0}}, stock, newId), OrderResult::InvalidQuantity);
     EXPECT_EQ(book.createOrder("C1", {{"SKU-100", -2}}, stock, newId), OrderResult::InvalidQuantity);
-    EXPECT_EQ(stock, sampleStock());
+    EXPECT_EQ(stock.quantity("SKU-100"), 10);
+    EXPECT_EQ(stock.quantity("SKU-200"), 5);
     EXPECT_EQ(book.size(), 0u);
 }
 
@@ -115,11 +121,12 @@ TEST(OrderBookTest, DuplicateSkusAreCombinedBeforeStockCheck)
     // 6 + 6 = 12 is more than the 10 available, even though each line alone fits.
     EXPECT_EQ(book.createOrder("C1", {{"SKU-100", 6}, {"SKU-100", 6}}, stock, newId),
               OrderResult::InsufficientStock);
-    EXPECT_EQ(stock, sampleStock());
+    EXPECT_EQ(stock.quantity("SKU-100"), 10);
+    EXPECT_EQ(stock.quantity("SKU-200"), 5);
 
     EXPECT_EQ(book.createOrder("C1", {{"SKU-100", 2}, {"SKU-100", 3}}, stock, newId),
               OrderResult::Ok);
-    EXPECT_EQ(stock["SKU-100"], 5);
+    EXPECT_EQ(stock.quantity("SKU-100"), 5);
     const Order* order = book.findOrder(newId);
     ASSERT_NE(order, nullptr);
     ASSERT_EQ(order->lines().size(), 1u);

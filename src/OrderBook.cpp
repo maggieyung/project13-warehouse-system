@@ -45,7 +45,9 @@ OrderResult OrderBook::createOrder(const std::string& customerId,
 
     // Every line fits, so reserve all of them together.
     for (const OrderLine& line : merged) {
-        stock[line.sku] -= line.quantity;
+        if (!stock.reserveStock(line.sku, line.quantity)) {
+            return OrderResult::InsufficientStock;
+        }
     }
     newId = nextId_++;
     orders_.push_back(std::make_unique<Order>(newId, customerId, merged));
@@ -57,9 +59,7 @@ std::vector<std::string> OrderBook::findShortages(const std::vector<OrderLine>& 
 {
     std::vector<std::string> shortages;
     for (const OrderLine& line : mergeDuplicateLines(lines)) {
-        auto it = stock.find(line.sku);
-        int available = (it == stock.end()) ? 0 : it->second;
-        if (line.quantity > available) {
+        if (line.quantity > stock.quantity(line.sku)) {
             shortages.push_back(line.sku);
         }
     }
@@ -71,7 +71,7 @@ std::vector<std::string> OrderBook::findUnknownSkus(const std::vector<OrderLine>
 {
     std::vector<std::string> unknown;
     for (const OrderLine& line : mergeDuplicateLines(lines)) {
-        if (stock.find(line.sku) == stock.end()) {
+        if (!stock.contains(line.sku)) {
             unknown.push_back(line.sku);
         }
     }

@@ -8,7 +8,10 @@ namespace {
 // Same sample stock as src/main.cpp, so the tests show what a user sees.
 OrderBook::StockMap sampleStock()
 {
-    return {{"SKU-100", 10}, {"SKU-200", 5}};
+    OrderBook::StockMap stock;
+    stock.addStock("SKU-100", 10);
+    stock.addStock("SKU-200", 5);
+    return stock;
 }
 
 bool contains(const std::string& text, const std::string& part)
@@ -55,7 +58,8 @@ TEST(OrderCommandTest, RejectsMissingPartsAndCreatesNothing)
         EXPECT_TRUE(contains(output, "Error:")) << bad << " -> " << output;
     }
     EXPECT_EQ(book.size(), 0u);
-    EXPECT_EQ(stock, sampleStock());
+    EXPECT_EQ(stock.quantity("SKU-100"), 10);
+    EXPECT_EQ(stock.quantity("SKU-200"), 5);
 }
 
 // AC1 end to end
@@ -68,8 +72,8 @@ TEST(OrderCommandTest, ValidOrderReservesStock)
 
     EXPECT_TRUE(contains(output, "Order 1 created for C1")) << output;
     EXPECT_TRUE(contains(output, "SKU-100 x3")) << output;
-    EXPECT_EQ(stock["SKU-100"], 7);
-    EXPECT_EQ(stock["SKU-200"], 3);
+    EXPECT_EQ(stock.quantity("SKU-100"), 7);
+    EXPECT_EQ(stock.quantity("SKU-200"), 3);
     EXPECT_EQ(book.size(), 1u);
 }
 
@@ -83,8 +87,8 @@ TEST(OrderCommandTest, InsufficientStockRejectsWholeOrder)
 
     EXPECT_TRUE(contains(output, "Rejected: insufficient stock for SKU-200")) << output;
     EXPECT_FALSE(contains(output, "SKU-100")) << output;
-    EXPECT_EQ(stock["SKU-100"], 10);
-    EXPECT_EQ(stock["SKU-200"], 5);
+    EXPECT_EQ(stock.quantity("SKU-100"), 10);
+    EXPECT_EQ(stock.quantity("SKU-200"), 5);
     EXPECT_EQ(book.size(), 0u);
 }
 
@@ -97,7 +101,8 @@ TEST(OrderCommandTest, UnknownSkuIsRejected)
     std::string output = runOrderCommand(book, stock, "order C3 SKU-999:1");
 
     EXPECT_TRUE(contains(output, "Rejected: unknown SKU SKU-999")) << output;
-    EXPECT_EQ(stock, sampleStock());
+    EXPECT_EQ(stock.quantity("SKU-100"), 10);
+    EXPECT_EQ(stock.quantity("SKU-200"), 5);
     EXPECT_EQ(book.size(), 0u);
 }
 

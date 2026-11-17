@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 #include "Order.h"
+#include "inventory.h"
 
 enum class OrderResult {
     Ok,
@@ -27,8 +28,7 @@ std::string toString(OrderResult result);
 
 class OrderBook {
 public:
-    // Available quantity per SKU. Stands in for the Inventory class until it is implemented.
-    using StockMap = std::unordered_map<std::string, int>;
+    using StockMap = Inventory;
 
     // Validates the order and, if every line can be filled, reserves the stock and stores the order.
     // Any failure rejects the whole order and leaves `stock` unchanged.
