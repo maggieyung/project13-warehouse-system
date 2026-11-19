@@ -44,13 +44,44 @@ Error: 'SKU-100:x' needs a whole-number quantity greater than 0
 > quit
 ```
 
+## Run the product creation demo
+
+This small feature accepts a SKU and product name, rejects empty
+fields, creates one Product object, and displays its details.
+
+After building the project, run:
+
+```bash
+./build/product_demo
+```
+
+Example:
+
+```text
+Enter SKU: KB001
+Enter product name: Keyboard
+
+Product created:
+SKU: KB001
+Name: Keyboard
+```
+
+If either field is empty, the demo displays:
+
+```text
+Error: SKU and name are required.
+```
+
+The product exists only during the current run. Whitespace-only
+fields are currently accepted.
+
 ## Run the tests
 
 ```sh
 ctest --test-dir build --output-on-failure
 ```
 
-Tests use GoogleTest (v1.14.0, fetched by CMake) and live in `test/`.
+Tests use GoogleTest (v1.14.0, fetched by CMake) and live in `test/`. Product tests cover valid product creation, an empty SKU, and an empty name.
 
 ## CI
 
@@ -60,7 +91,9 @@ Tests use GoogleTest (v1.14.0, fetched by CMake) and live in `test/`.
 
 - In-memory only: orders and stock are lost when the app exits (no persistence yet).
 - Stock is hard-coded sample data in `src/main.cpp`; the `Inventory` class (`include/inventory.h`) is not implemented or wired in yet, so it is not part of the build.
-- No Product or Customer classes yet: any SKU in the sample stock and any customer id are accepted.
+- A Product class and separate product creation demo are implemented.
+  Product creation is not yet connected to the order application.
+- No Customer class yet.
 - Order status, cancelling, shipping, and reports are not implemented yet.
 
 ## Project layout
