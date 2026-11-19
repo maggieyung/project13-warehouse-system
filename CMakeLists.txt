@@ -14,8 +14,16 @@ add_library(warehouse_core
     src/OrderBook.cpp
     src/OrderCommand.cpp
     src/inventory.cpp
+    src/product.cpp
 )
+
+target_link_libraries(warehouse PRIVATE warehouse_core)
+
 target_include_directories(warehouse_core PUBLIC include)
+
+# Product creation demo
+add_executable(product_demo src/product_demo.cpp)
+target_link_libraries(product_demo PRIVATE warehouse_core)
 
 # Console application
 add_executable(warehouse src/main.cpp)
@@ -39,6 +47,7 @@ add_executable(warehouse_tests
     test/order_book_test.cpp
     test/order_command_test.cpp
     test/inventory_test.cpp
+    test/product_test.cpp
 )
 target_link_libraries(warehouse_tests PRIVATE warehouse_core GTest::gtest_main)
 gtest_discover_tests(warehouse_tests)
