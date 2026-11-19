@@ -17,7 +17,6 @@ add_library(warehouse_core
     src/product.cpp
 )
 
-target_link_libraries(warehouse PRIVATE warehouse_core)
 
 target_include_directories(warehouse_core PUBLIC include)
 
