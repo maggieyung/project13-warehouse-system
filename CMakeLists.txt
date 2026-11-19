@@ -21,13 +21,13 @@ target_link_libraries(warehouse PRIVATE warehouse_core)
 
 target_include_directories(warehouse_core PUBLIC include)
 
-# Product creation demo
-add_executable(product_demo src/product_demo.cpp)
-target_link_libraries(product_demo PRIVATE warehouse_core)
-
 # Console application
 add_executable(warehouse src/main.cpp)
 target_link_libraries(warehouse PRIVATE warehouse_core)
+
+# Product creation demo
+add_executable(product_demo src/product_demo.cpp)
+target_link_libraries(product_demo PRIVATE warehouse_core)
 
 # Tests (GoogleTest pinned to a release tag so CI does not change under us)
 enable_testing()
