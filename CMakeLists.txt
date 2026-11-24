@@ -24,6 +24,10 @@ target_include_directories(warehouse_core PUBLIC include)
 add_executable(warehouse src/main.cpp)
 target_link_libraries(warehouse PRIVATE warehouse_core)
 
+# Warehouse demo
+add_executable(warehouse_demo src/warehouse_demo.cpp)
+target_link_libraries(warehouse_demo PRIVATE warehouse_core)
+
 # Product creation demo
 add_executable(product_demo src/product_demo.cpp)
 target_link_libraries(product_demo PRIVATE warehouse_core)

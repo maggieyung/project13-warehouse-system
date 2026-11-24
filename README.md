@@ -44,6 +44,12 @@ Error: 'SKU-100:x' needs a whole-number quantity greater than 0
 > quit
 ```
 
+## Run the warehouse demo
+
+```sh
+./build/warehouse_demo
+```
+
 ## Run the product creation demo
 
 This small feature accepts a SKU and product name, rejects empty
